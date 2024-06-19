@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { PDFCheckBox, PDFDocument, PDFTextField } from 'pdf-lib';
+import { PDFCheckBox, PDFDocument, PDFDropdown, PDFRadioGroup, PDFTextField } from 'pdf-lib';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +24,7 @@ export class AppComponent {
 
     const file = input.files[0];
 
-    const pdfDoc = await PDFDocument.load(await file.arrayBuffer());
+    const pdfDoc = await PDFDocument.load(await file.arrayBuffer(), {});
 
     const form = pdfDoc.getForm();
     for (const field of form.getFields()) {
@@ -37,12 +37,22 @@ export class AppComponent {
           const buffer = await data.arrayBuffer();
           field.setImage(await pdfDoc.embedJpg(buffer));
           field.enableReadOnly();
+        } else {
+          field.setText('Hello World!');
         }
       } else if (field instanceof PDFCheckBox) {
         this.fields.push({ name: field.getName(), value: field.isChecked() ? 'checked' : 'unchecked' });
         field.check();
+      } else if (field instanceof PDFRadioGroup) {
+        const options = field.getOptions();
+        this.fields.push({ name: field.getName(), value: options.map(o => o).join(', ') });
+        field.select(options[1]);
+      } else if (field instanceof PDFDropdown) {
+        const options = field.getOptions();
+        this.fields.push({ name: field.getName(), value: options.map(o => o).join(', ') });
+        field.select(options[1]);
       }
-      
+
       else {
         this.fields.push({ name: field.getName(), value: 'unknown' });
 
