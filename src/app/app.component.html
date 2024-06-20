@@ -7,3 +7,32 @@
     <span>{{field.name}}</span>:<span>{{field.value}}</span>
   </li>
 </ul>
+<pdf-viewer
+      [src]="originalPdf"
+      [rotation]="0"
+      [original-size]="false"
+      [show-all]="true"
+      [fit-to-page]="true"
+      [zoom]="1"
+      [stick-to-page]="false"
+      [render-text]="true"
+      [external-link-target]="'blank'"
+      [autoresize]="true"
+      [show-borders]="false"
+      style="width: 50%; height: 100vh; display: inline-block;"
+    ></pdf-viewer>
+
+<pdf-viewer
+      [src]="filledPdf"
+      [rotation]="0"
+      [original-size]="false"
+      [show-all]="true"
+      [fit-to-page]="true"
+      [zoom]="1"
+      [stick-to-page]="false"
+      [render-text]="true"
+      [external-link-target]="'blank'"
+      [autoresize]="true"
+      [show-borders]="false"
+      style="width: 50%; height: 100vh;  display: inline-block;"
+    ></pdf-viewer>

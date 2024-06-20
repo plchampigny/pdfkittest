@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { PDFCheckBox, PDFDocument, PDFDropdown, PDFRadioGroup, PDFTextField } from 'pdf-lib';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule],
+  imports: [RouterOutlet, CommonModule, PdfViewerModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -14,6 +15,9 @@ export class AppComponent {
   title = 'pdfkittest';
 
   public fields: { name: string, value: string | undefined }[] = [];
+
+  public originalPdf: string | undefined;
+  public filledPdf: string | undefined;
 
   public async onFileChange(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -24,7 +28,12 @@ export class AppComponent {
 
     const file = input.files[0];
 
+    const buffer = await file.arrayBuffer();
+
     const pdfDoc = await PDFDocument.load(await file.arrayBuffer(), {});
+
+    const originalBlob = new Blob([await pdfDoc.save()], { type: 'application/pdf' });
+    this.originalPdf = URL.createObjectURL(originalBlob);
 
     const form = pdfDoc.getForm();
     for (const field of form.getFields()) {
@@ -54,21 +63,13 @@ export class AppComponent {
       }
 
       else {
-        this.fields.push({ name: field.getName(), value: 'unknown' });
+        this.fields.push({ name: field.getName(), value: typeof field });
 
       }
     }
 
     const blob = new Blob([await pdfDoc.save()], { type: 'application/pdf' });
-    this.downloadBlob(blob, 'output.pdf');
+    this.filledPdf = URL.createObjectURL(blob);
 
-  }
-
-  private downloadBlob(blob: Blob, name: string) {
-    const uri = URL.createObjectURL(blob);
-    var link = document.createElement("a");
-    link.download = name;
-    link.href = uri;
-    link.click();
   }
 }
